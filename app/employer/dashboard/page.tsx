@@ -34,12 +34,9 @@ export default async function EmployerDashboard() {
         orderBy: { createdAt: "desc" },
         include: {
           skills: { where: { required: true }, include: { skill: true } },
-          _count: {
-            select: {
-              matches: {
-                where: { status: "PENDING" },
-              },
-            },
+          matches: {
+            where: { status: { in: ["PENDING", "INVITED"] } },
+            select: { id: true, status: true },
           },
         },
       },
@@ -130,7 +127,8 @@ function PositionCard({
   position: any;
   dimmed?: boolean;
 }) {
-  const pendingCount = position._count.matches;
+  const pendingCount = position.matches.filter((m: any) => m.status === "PENDING").length;
+  const invitedCount = position.matches.filter((m: any) => m.status === "INVITED").length;
 
   return (
     <Card className={dimmed ? "opacity-60" : ""}>
@@ -155,19 +153,21 @@ function PositionCard({
             </div>
           </div>
           <div className="shrink-0 text-right">
-            {pendingCount > 0 ? (
-              <Link href={`/employer/positions/${position.id}/candidates`}>
+            <Link href={`/employer/positions/${position.id}/candidates`}>
+              {pendingCount > 0 ? (
                 <Button size="sm" variant="default">
                   {pendingCount} {pluralCandidates(pendingCount)}
                 </Button>
-              </Link>
-            ) : (
-              <Link href={`/employer/positions/${position.id}/candidates`}>
+              ) : invitedCount > 0 ? (
+                <Button size="sm" variant="outline" className="text-amber-700 border-amber-300 bg-amber-50">
+                  {invitedCount} приглашено
+                </Button>
+              ) : (
                 <Button size="sm" variant="outline" className="text-zinc-500">
                   Кандидаты
                 </Button>
-              </Link>
-            )}
+              )}
+            </Link>
           </div>
         </div>
       </CardContent>
