@@ -151,6 +151,7 @@ function InvitationCard({ match }: { match: any }) {
                   {new Date(match.proposedSlotAt).toLocaleString("ru-RU", {
                     weekday: "short", day: "numeric", month: "long",
                     hour: "2-digit", minute: "2-digit",
+                    timeZone: "Europe/Moscow",
                   })}
                 </span>
               </p>
@@ -181,7 +182,7 @@ function ScheduledCard({ match }: { match: any }) {
             <p className="text-sm text-zinc-500">{position.company.name}</p>
             {interview && (
               <p className="text-sm text-green-700 mt-1">
-                {new Date(interview.scheduledAt).toLocaleString("ru-RU", { dateStyle: "medium", timeStyle: "short" })}
+                {new Date(interview.scheduledAt).toLocaleString("ru-RU", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Moscow" })}
               </p>
             )}
           </div>

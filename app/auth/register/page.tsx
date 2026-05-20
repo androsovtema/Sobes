@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +13,9 @@ type Role = "CANDIDATE" | "EMPLOYER";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [role, setRole] = useState<Role>("CANDIDATE");
+  const searchParams = useSearchParams();
+  const initialRole: Role = searchParams.get("role") === "employer" ? "EMPLOYER" : "CANDIDATE";
+  const [role, setRole] = useState<Role>(initialRole);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
