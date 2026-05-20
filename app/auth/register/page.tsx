@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 
 type Role = "CANDIDATE" | "EMPLOYER";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialRole: Role = searchParams.get("role") === "employer" ? "EMPLOYER" : "CANDIDATE";
@@ -63,93 +63,100 @@ export default function RegisterPage() {
   }
 
   return (
+    <CardContent>
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <button
+          type="button"
+          onClick={() => setRole("CANDIDATE")}
+          className={`rounded-lg border-2 p-4 text-left transition-colors ${
+            role === "CANDIDATE"
+              ? "border-zinc-900 bg-zinc-900 text-white"
+              : "border-zinc-200 hover:border-zinc-400"
+          }`}
+        >
+          <div className="font-semibold">Ищу работу</div>
+          <div className={`text-xs mt-1 ${role === "CANDIDATE" ? "text-zinc-300" : "text-zinc-500"}`}>
+            Соискатель
+          </div>
+        </button>
+        <button
+          type="button"
+          onClick={() => setRole("EMPLOYER")}
+          className={`rounded-lg border-2 p-4 text-left transition-colors ${
+            role === "EMPLOYER"
+              ? "border-zinc-900 bg-zinc-900 text-white"
+              : "border-zinc-200 hover:border-zinc-400"
+          }`}
+        >
+          <div className="font-semibold">Нанимаю</div>
+          <div className={`text-xs mt-1 ${role === "EMPLOYER" ? "text-zinc-300" : "text-zinc-500"}`}>
+            Работодатель
+          </div>
+        </button>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            required
+            autoComplete="email"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="password">Пароль</Label>
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            placeholder="Минимум 8 символов"
+            required
+            autoComplete="new-password"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="confirm">Повторите пароль</Label>
+          <Input
+            id="confirm"
+            name="confirm"
+            type="password"
+            placeholder="••••••••"
+            required
+            autoComplete="new-password"
+          />
+        </div>
+        {error && (
+          <p className="text-sm text-red-500">{error}</p>
+        )}
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? "Создаём аккаунт..." : "Создать аккаунт"}
+        </Button>
+      </form>
+      <p className="mt-4 text-center text-sm text-zinc-500">
+        Уже есть аккаунт?{" "}
+        <Link href="/auth/login" className="font-medium text-zinc-900 hover:underline">
+          Войти
+        </Link>
+      </p>
+    </CardContent>
+  );
+}
+
+export default function RegisterPage() {
+  return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-50 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Собес</CardTitle>
           <CardDescription>Создайте аккаунт</CardDescription>
         </CardHeader>
-        <CardContent>
-          {/* Выбор роли */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            <button
-              type="button"
-              onClick={() => setRole("CANDIDATE")}
-              className={`rounded-lg border-2 p-4 text-left transition-colors ${
-                role === "CANDIDATE"
-                  ? "border-zinc-900 bg-zinc-900 text-white"
-                  : "border-zinc-200 hover:border-zinc-400"
-              }`}
-            >
-              <div className="font-semibold">Ищу работу</div>
-              <div className={`text-xs mt-1 ${role === "CANDIDATE" ? "text-zinc-300" : "text-zinc-500"}`}>
-                Соискатель
-              </div>
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole("EMPLOYER")}
-              className={`rounded-lg border-2 p-4 text-left transition-colors ${
-                role === "EMPLOYER"
-                  ? "border-zinc-900 bg-zinc-900 text-white"
-                  : "border-zinc-200 hover:border-zinc-400"
-              }`}
-            >
-              <div className="font-semibold">Нанимаю</div>
-              <div className={`text-xs mt-1 ${role === "EMPLOYER" ? "text-zinc-300" : "text-zinc-500"}`}>
-                Работодатель
-              </div>
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="you@example.com"
-                required
-                autoComplete="email"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Пароль</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Минимум 8 символов"
-                required
-                autoComplete="new-password"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirm">Повторите пароль</Label>
-              <Input
-                id="confirm"
-                name="confirm"
-                type="password"
-                placeholder="••••••••"
-                required
-                autoComplete="new-password"
-              />
-            </div>
-            {error && (
-              <p className="text-sm text-red-500">{error}</p>
-            )}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Создаём аккаунт..." : "Создать аккаунт"}
-            </Button>
-          </form>
-          <p className="mt-4 text-center text-sm text-zinc-500">
-            Уже есть аккаунт?{" "}
-            <Link href="/auth/login" className="font-medium text-zinc-900 hover:underline">
-              Войти
-            </Link>
-          </p>
-        </CardContent>
+        <Suspense fallback={<CardContent className="py-8 text-center text-zinc-400">Загрузка...</CardContent>}>
+          <RegisterForm />
+        </Suspense>
       </Card>
     </div>
   );

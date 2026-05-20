@@ -25,7 +25,6 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleString("ru-RU", {
     weekday: "short", day: "numeric", month: "long",
     hour: "2-digit", minute: "2-digit",
-    timeZone: "Europe/Moscow",
   });
 }
 

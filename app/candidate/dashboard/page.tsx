@@ -4,8 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { logout } from "@/app/auth/actions";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { LocalTime } from "@/components/LocalTime";
 
 export default async function CandidateDashboard() {
   const supabase = await createClient();
@@ -39,7 +40,6 @@ export default async function CandidateDashboard() {
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      {/* Шапка */}
       <header className="bg-white border-b px-4 sm:px-6 py-4 flex items-center justify-between gap-2">
         <div className="font-bold text-lg shrink-0">Собес</div>
         <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 sm:gap-4">
@@ -53,13 +53,11 @@ export default async function CandidateDashboard() {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-8 space-y-6">
-        {/* Приветствие */}
         <div>
           <h1 className="text-2xl font-bold">Привет, {profile.firstName}</h1>
           <p className="text-zinc-500 mt-1">{profile.headline} · {profile.grade}</p>
         </div>
 
-        {/* Приглашения */}
         <section>
           <h2 className="text-lg font-semibold mb-3">
             Приглашения{invitations.length > 0 && <span className="ml-2 text-sm font-normal text-zinc-500">({invitations.length})</span>}
@@ -81,7 +79,6 @@ export default async function CandidateDashboard() {
           )}
         </section>
 
-        {/* Запланированные встречи */}
         {scheduled.length > 0 && (
           <section>
             <h2 className="text-lg font-semibold mb-3">Запланированные встречи</h2>
@@ -93,7 +90,6 @@ export default async function CandidateDashboard() {
           </section>
         )}
 
-        {/* Быстрые действия */}
         <section className="grid grid-cols-2 gap-3">
           <Link href="/candidate/profile">
             <Card className="hover:shadow-md transition-shadow cursor-pointer">
@@ -121,9 +117,8 @@ export default async function CandidateDashboard() {
 
 function InvitationCard({ match }: { match: any }) {
   const { position } = match;
-  // Извлекаем краткие "почему вас пригласили" факты из breakdown (если есть).
   const breakdown = match.scoreBreakdown as
-    | { fit?: { meta?: { requiredCoveredPct?: number; matchedRequiredSkills?: string[] } }; interest?: { pAccept?: number } }
+    | { fit?: { meta?: { requiredCoveredPct?: number } }; interest?: { pAccept?: number } }
     | null;
   const coveredPct = breakdown?.fit?.meta?.requiredCoveredPct;
   return (
@@ -148,11 +143,7 @@ function InvitationCard({ match }: { match: any }) {
               <p className="text-sm mt-2">
                 🕒 Предлагаемое время:{" "}
                 <span className="font-medium text-zinc-900">
-                  {new Date(match.proposedSlotAt).toLocaleString("ru-RU", {
-                    weekday: "short", day: "numeric", month: "long",
-                    hour: "2-digit", minute: "2-digit",
-                    timeZone: "Europe/Moscow",
-                  })}
+                  <LocalTime iso={match.proposedSlotAt} />
                 </span>
               </p>
             ) : (
@@ -182,7 +173,7 @@ function ScheduledCard({ match }: { match: any }) {
             <p className="text-sm text-zinc-500">{position.company.name}</p>
             {interview && (
               <p className="text-sm text-green-700 mt-1">
-                {new Date(interview.scheduledAt).toLocaleString("ru-RU", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Moscow" })}
+                <LocalTime iso={interview.scheduledAt} options={{ dateStyle: "medium", timeStyle: "short" }} />
               </p>
             )}
           </div>
@@ -206,7 +197,6 @@ function ScheduledCard({ match }: { match: any }) {
   );
 }
 
-// Клиентский компонент для кнопок ответа вынесем в отдельный файл
 function RespondButton({ matchId, action }: { matchId: string; action: "accept" | "reject" }) {
   return (
     <form action={`/api/candidate/invitations/${matchId}/respond`} method="POST">
