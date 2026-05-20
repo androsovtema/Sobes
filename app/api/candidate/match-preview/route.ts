@@ -52,7 +52,7 @@ export async function POST(request: Request) {
     prisma.skillRelation.findMany(),
   ]);
 
-  const nameToId = new Map(skills.map((s) => [s.name.toLowerCase(), s.id] as const));
+  const nameToId = new Map(skills.map((s: { id: string; name: string }) => [s.name.toLowerCase(), s.id] as const));
   const resolveIds = (names: string[]) =>
     names
       .map((n) => nameToId.get(n.toLowerCase()))
