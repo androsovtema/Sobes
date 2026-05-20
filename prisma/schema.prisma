@@ -1,0 +1,330 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enum Types ───────────────────────────────────────────────
+
+enum Role {
+  CANDIDATE
+  EMPLOYER
+}
+
+enum WorkFormat {
+  REMOTE
+  OFFICE
+  HYBRID
+}
+
+enum Grade {
+  INTERN
+  JUNIOR
+  MIDDLE
+  SENIOR
+  LEAD
+  PRINCIPAL
+}
+
+enum MatchStatus {
+  PENDING      // алгоритм нашёл пару, ждём решения HR
+  INVITED      // HR нажал "Позвать", ждём соискателя
+  ACCEPTED     // соискатель принял, ищем слот
+  REJECTED_HR  // HR отклонил
+  REJECTED_CANDIDATE // соискатель отклонил
+  SCHEDULED    // встреча забронирована
+  COMPLETED    // встреча прошла
+}
+
+enum DayOfWeek {
+  MON
+  TUE
+  WED
+  THU
+  FRI
+  SAT
+  SUN
+}
+
+enum SkillSource {
+  MANUAL     // кандидат добавил сам
+  SUGGESTED  // добавлено по подсказке платформы (supply-aware)
+}
+
+// ─── Core Models ─────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  candidateProfile CandidateProfile?
+  company          Company?
+  yandexAccount    YandexAccount?
+
+  @@map("users")
+}
+
+// ─── Yandex OAuth ─────────────────────────────────────────────
+// Хранит токены для Яндекс Календаря (и Telemost через него).
+// access/refresh токены зашифрованы (AES-256-GCM, см. lib/crypto.ts).
+model YandexAccount {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  yandexId      String   // числовой ID пользователя Яндекса
+  login         String   // логин на Яндексе
+  email         String?  // основной email Яндекс-аккаунта
+  displayName   String?  // имя для отображения
+
+  accessTokenEnc  String  // зашифрован
+  refreshTokenEnc String  // зашифрован
+  expiresAt       DateTime
+  scope           String  // выданные scope (через пробел)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([yandexId])
+  @@map("yandex_accounts")
+}
+
+// ─── Candidate Side ───────────────────────────────────────────
+
+model CandidateProfile {
+  id          String     @id @default(uuid())
+  userId      String     @unique
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  firstName   String
+  lastName    String
+  headline    String     // "Senior React Developer"
+  bio         String?
+  yearsExp    Int        // лет опыта
+  grade       Grade
+  workFormat  WorkFormat
+  salaryMin   Int        // желаемая зарплата от (RUB)
+  salaryMax   Int        // желаемая зарплата до (RUB)
+  currency    String     @default("RUB")
+
+  skills      CandidateSkill[]
+  portfolio   PortfolioLink[]
+  timeSlots   CandidateSlot[]
+  matches     Match[]
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("candidate_profiles")
+}
+
+model Skill {
+  id         String             @id @default(uuid())
+  name       String             @unique // канон: "React", "Python", "Figma"
+  category   String?            // "Frontend", "Backend", "Design"
+
+  candidates    CandidateSkill[]
+  positions     PositionSkill[]
+  aliases       SkillAlias[]
+  relationsFrom SkillRelation[]  @relation("RelFrom")
+  relationsTo   SkillRelation[]  @relation("RelTo")
+
+  @@map("skills")
+}
+
+// Явная join-таблица: позволяет нести source (MANUAL / SUGGESTED)
+// и в будущем — verified (после интервью).
+model CandidateSkill {
+  candidateId String
+  skillId     String
+  source      SkillSource @default(MANUAL)
+  createdAt   DateTime    @default(now())
+
+  candidate   CandidateProfile @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  skill       Skill            @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([candidateId, skillId])
+  @@index([skillId])
+  @@map("candidate_skills")
+}
+
+// Явная join-таблица: разделяет required и nice-to-have.
+// Покрытие required — основной фактор FitScore.
+model PositionSkill {
+  positionId String
+  skillId    String
+  required   Boolean @default(true)
+
+  position   Position @relation(fields: [positionId], references: [id], onDelete: Cascade)
+  skill      Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([positionId, skillId])
+  @@index([skillId])
+  @@map("position_skills")
+}
+
+// Алиасы для нормализации: "ReactJS", "React.js" → Skill "React".
+model SkillAlias {
+  id      String @id @default(uuid())
+  skillId String
+  alias   String @unique // lowercased
+
+  skill   Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@index([skillId])
+  @@map("skill_aliases")
+}
+
+// Граф родственных навыков: React ↔ Next.js = 0.7
+// Используется в FitScore для partial credit.
+model SkillRelation {
+  fromId   String
+  toId     String
+  weight   Float  // 0..1, насколько "from" покрывает "to"
+
+  from     Skill  @relation("RelFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to       Skill  @relation("RelTo",   fields: [toId],   references: [id], onDelete: Cascade)
+
+  @@id([fromId, toId])
+  @@index([toId])
+  @@map("skill_relations")
+}
+
+model PortfolioLink {
+  id          String           @id @default(uuid())
+  candidateId String
+  candidate   CandidateProfile @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  label       String  // "GitHub", "Behance", "Личный сайт"
+  url         String
+
+  @@map("portfolio_links")
+}
+
+model CandidateSlot {
+  id          String           @id @default(uuid())
+  candidateId String
+  candidate   CandidateProfile @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  dayOfWeek   DayOfWeek
+  startTime   String  // "10:00"
+  endTime     String  // "14:00"
+  maxPerDay   Int     @default(2)
+
+  @@map("candidate_slots")
+}
+
+// ─── Employer Side ────────────────────────────────────────────
+
+model Company {
+  id          String     @id @default(uuid())
+  userId      String     @unique
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name        String
+  website     String?
+  description String?
+  industry    String?    // "IT", "Fintech", "E-commerce"
+  size        String?    // "1-10", "11-50", "51-200", "200+"
+  logoUrl     String?
+
+  positions   Position[]
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("companies")
+}
+
+model Position {
+  id          String     @id @default(uuid())
+  companyId   String
+  company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String
+  grade       Grade
+  workFormat  WorkFormat
+  salaryMin   Int
+  salaryMax   Int
+  currency    String     @default("RUB")
+  isActive    Boolean    @default(true)
+
+  skills         PositionSkill[]
+  hrSlots        HRSlot[]
+  matches        Match[]
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("positions")
+}
+
+model HRSlot {
+  id          String   @id @default(uuid())
+  positionId  String
+  position    Position @relation(fields: [positionId], references: [id], onDelete: Cascade)
+
+  dayOfWeek   DayOfWeek
+  startTime   String  // "11:00"
+  endTime     String  // "15:00"
+  maxPerDay   Int     @default(3)
+
+  @@map("hr_slots")
+}
+
+// ─── Matching & Scheduling ────────────────────────────────────
+
+model Match {
+  id          String      @id @default(uuid())
+  candidateId String
+  candidate   CandidateProfile @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  positionId  String
+  position    Position    @relation(fields: [positionId], references: [id], onDelete: Cascade)
+
+  // Итоговый балл (0-100): результат композиции трёх множителей.
+  score             Int
+  // Составляющие — храним явно для прозрачности и обучения.
+  fitScore          Int     @default(0)  // содержательная совместимость
+  feasibilityScore  Int     @default(0)  // реальная возможность встретиться
+  interestScore     Int     @default(0)  // P_invite × P_accept
+
+  // Подробный разбор: { skills: 32, grade: 15, salary: 12, ... }
+  scoreBreakdown    Json?
+
+  // Конкретное время слота, подобранное при HR-инвайте (резерв).
+  // При accept → переезжает в Interview.scheduledAt.
+  proposedSlotAt    DateTime?
+
+  status      MatchStatus @default(PENDING)
+
+  interview   Interview?
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([candidateId, positionId])
+  @@map("matches")
+}
+
+model Interview {
+  id          String   @id @default(uuid())
+  matchId     String   @unique
+  match       Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  scheduledAt DateTime  // конкретная дата и время встречи
+  durationMin Int       @default(60)
+  meetLink    String?   // Google Meet ссылка
+  calendarEventIdCandidate String?
+  calendarEventIdHR        String?
+
+  createdAt   DateTime @default(now())
+
+  @@map("interviews")
+}
