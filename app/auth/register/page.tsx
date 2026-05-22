@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -63,41 +62,42 @@ function RegisterForm() {
   }
 
   return (
-    <CardContent>
+    <div className="bg-white rounded-[28px] p-8 shadow-[0_4px_32px_rgba(0,0,0,0.09)]">
+      {/* Role selector */}
       <div className="grid grid-cols-2 gap-3 mb-6">
         <button
           type="button"
           onClick={() => setRole("CANDIDATE")}
-          className={`rounded-lg border-2 p-4 text-left transition-colors ${
+          className={`rounded-2xl border-2 p-4 text-left transition-all ${
             role === "CANDIDATE"
-              ? "border-zinc-900 bg-zinc-900 text-white"
-              : "border-zinc-200 hover:border-zinc-400"
+              ? "border-brand bg-brand text-white"
+              : "border-border hover:border-brand/40 text-ink"
           }`}
         >
-          <div className="font-semibold">Ищу работу</div>
-          <div className={`text-xs mt-1 ${role === "CANDIDATE" ? "text-zinc-300" : "text-zinc-500"}`}>
+          <div className="font-semibold text-[14px]">Ищу работу</div>
+          <div className={`text-xs mt-0.5 ${role === "CANDIDATE" ? "text-white/70" : "text-dim"}`}>
             Соискатель
           </div>
         </button>
         <button
           type="button"
           onClick={() => setRole("EMPLOYER")}
-          className={`rounded-lg border-2 p-4 text-left transition-colors ${
+          className={`rounded-2xl border-2 p-4 text-left transition-all ${
             role === "EMPLOYER"
-              ? "border-zinc-900 bg-zinc-900 text-white"
-              : "border-zinc-200 hover:border-zinc-400"
+              ? "border-brand bg-brand text-white"
+              : "border-border hover:border-brand/40 text-ink"
           }`}
         >
-          <div className="font-semibold">Нанимаю</div>
-          <div className={`text-xs mt-1 ${role === "EMPLOYER" ? "text-zinc-300" : "text-zinc-500"}`}>
+          <div className="font-semibold text-[14px]">Нанимаю</div>
+          <div className={`text-xs mt-0.5 ${role === "EMPLOYER" ? "text-white/70" : "text-dim"}`}>
             Работодатель
           </div>
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email" className="text-ink font-medium text-sm">Email</Label>
           <Input
             id="email"
             name="email"
@@ -108,7 +108,7 @@ function RegisterForm() {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="password">Пароль</Label>
+          <Label htmlFor="password" className="text-ink font-medium text-sm">Пароль</Label>
           <Input
             id="password"
             name="password"
@@ -119,7 +119,7 @@ function RegisterForm() {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="confirm">Повторите пароль</Label>
+          <Label htmlFor="confirm" className="text-ink font-medium text-sm">Повторите пароль</Label>
           <Input
             id="confirm"
             name="confirm"
@@ -130,34 +130,56 @@ function RegisterForm() {
           />
         </div>
         {error && (
-          <p className="text-sm text-red-500">{error}</p>
+          <p className="text-sm text-destructive">{error}</p>
         )}
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" size="lg" className="w-full mt-1" disabled={loading}>
           {loading ? "Создаём аккаунт..." : "Создать аккаунт"}
         </Button>
       </form>
-      <p className="mt-4 text-center text-sm text-zinc-500">
+      <p className="mt-6 text-center text-sm text-subtle">
         Уже есть аккаунт?{" "}
-        <Link href="/auth/login" className="font-medium text-zinc-900 hover:underline">
+        <Link
+          href="/auth/login"
+          className="font-semibold text-brand hover:opacity-80 transition-opacity"
+        >
           Войти
         </Link>
       </p>
-    </CardContent>
+    </div>
   );
 }
 
 export default function RegisterPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-50 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Собес</CardTitle>
-          <CardDescription>Создайте аккаунт</CardDescription>
-        </CardHeader>
-        <Suspense fallback={<CardContent className="py-8 text-center text-zinc-400">Загрузка...</CardContent>}>
-          <RegisterForm />
-        </Suspense>
-      </Card>
+    <div className="min-h-screen bg-white flex flex-col">
+      <header className="px-6 h-14 flex items-center">
+        <Link href="/" className="text-brand font-bold text-xl tracking-tight">
+          Собес
+        </Link>
+      </header>
+
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <h1 className="text-[28px] font-bold text-ink tracking-tight">
+              Создайте аккаунт
+            </h1>
+            <p className="text-subtle mt-1.5 text-[15px]">
+              Начните находить лучшие совпадения
+            </p>
+          </div>
+
+          <Suspense
+            fallback={
+              <div className="bg-white rounded-[28px] p-8 shadow-[0_4px_32px_rgba(0,0,0,0.09)] text-center text-dim py-16">
+                Загрузка...
+              </div>
+            }
+          >
+            <RegisterForm />
+          </Suspense>
+        </div>
+      </div>
     </div>
   );
 }

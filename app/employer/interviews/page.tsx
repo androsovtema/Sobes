@@ -47,19 +47,23 @@ export default async function EmployerInterviewsPage() {
   }));
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="bg-white border-b px-4 sm:px-6 py-4 flex items-center justify-between gap-2">
-        <div className="font-bold text-lg shrink-0">Собес</div>
-        <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 sm:gap-4">
-          <Link href="/employer/dashboard" className="text-sm text-zinc-500 hover:text-zinc-900">← Дашборд</Link>
-          <Link href="/settings" className="text-sm text-zinc-500 hover:text-zinc-900 hidden sm:inline">Настройки</Link>
+    <div className="min-h-screen bg-[#f4f6f2]">
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-sm border-b border-black/[0.08] px-4 sm:px-6 h-14 flex items-center justify-between">
+        <div className="text-brand font-bold text-xl tracking-tight">Собес</div>
+        <div className="flex items-center gap-4 sm:gap-5">
+          <Link href="/employer/dashboard" className="text-sm font-medium text-subtle hover:text-ink transition-colors">
+            ← Дашборд
+          </Link>
+          <Link href="/settings" className="text-sm font-medium text-subtle hover:text-ink transition-colors hidden sm:inline">
+            Настройки
+          </Link>
           <form action={logout}>
-            <button type="submit" className="text-sm text-zinc-400 hover:text-zinc-600">Выйти</button>
+            <button type="submit" className="text-sm text-dim hover:text-subtle transition-colors">Выйти</button>
           </form>
         </div>
       </header>
       <main className="max-w-3xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">Встречи</h1>
+        <h1 className="text-[24px] font-bold text-ink tracking-tight mb-6">Встречи</h1>
         <div className="mb-6">
           <YandexCalendarConnect returnTo="/employer/interviews" />
         </div>

@@ -165,63 +165,64 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
       })).filter((g) => g.skills.length > 0)
     : SKILL_GROUPS;
 
+  const SELECT_CLASS = "h-11 rounded-[10px] border border-border bg-white px-3 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-colors";
+
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="bg-white border-b px-6 py-4 flex items-center justify-between">
-        <div className="font-bold text-lg">Собес</div>
-        <div className="flex items-center gap-4">
-          <Link href="/candidate/dashboard" className="text-sm text-zinc-500 hover:text-zinc-900">Дашборд</Link>
-          <Link href="/candidate/availability" className="text-sm text-zinc-500 hover:text-zinc-900">Мои слоты</Link>
+    <div className="min-h-screen bg-[#f4f6f2]">
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-sm border-b border-black/[0.08] px-4 sm:px-6 h-14 flex items-center justify-between">
+        <div className="text-brand font-bold text-xl tracking-tight">Собес</div>
+        <div className="flex items-center gap-4 sm:gap-5">
+          <Link href="/candidate/dashboard" className="text-sm font-medium text-subtle hover:text-ink transition-colors">Дашборд</Link>
+          <Link href="/candidate/availability" className="text-sm font-medium text-subtle hover:text-ink transition-colors">Слоты</Link>
           <form action={logout}>
-            <button type="submit" className="text-sm text-zinc-400 hover:text-zinc-600">Выйти</button>
+            <button type="submit" className="text-sm text-dim hover:text-subtle transition-colors">Выйти</button>
           </form>
         </div>
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Мой профиль</h1>
+        <div className="flex items-center justify-between mb-6 pt-2">
+          <h1 className="text-[24px] font-bold text-ink tracking-tight">Мой профиль</h1>
           {!isEditing && (
             <Button variant="outline" onClick={() => setIsEditing(true)}>Редактировать</Button>
           )}
         </div>
 
         {success && !isEditing && (
-          <div className="mb-4 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
+          <div className="mb-5 rounded-2xl bg-cta/10 border border-cta/30 px-5 py-3 text-sm font-medium text-brand">
             Профиль успешно обновлён
           </div>
         )}
 
-        <div className="mb-4">
+        <div className="mb-5">
           <YandexCalendarConnect returnTo="/candidate/profile" />
         </div>
 
         {!isEditing ? (
-          /* ── Режим просмотра ── */
           <div className="space-y-4">
             <Card>
               <CardContent className="py-5 space-y-3">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h2 className="text-xl font-semibold">{profile.firstName} {profile.lastName}</h2>
-                    <p className="text-zinc-500 mt-0.5">{profile.headline}</p>
+                    <h2 className="text-[20px] font-bold text-ink">{profile.firstName} {profile.lastName}</h2>
+                    <p className="text-subtle mt-0.5">{profile.headline}</p>
                   </div>
-                  <Badge variant="outline" className="shrink-0 mt-1">{GRADE_LABELS[profile.grade]}</Badge>
+                  <Badge variant="secondary" className="shrink-0 mt-1">{GRADE_LABELS[profile.grade]}</Badge>
                 </div>
-                {profile.bio && <p className="text-sm text-zinc-600">{profile.bio}</p>}
-                <div className="flex items-center gap-4 text-sm text-zinc-500">
-                  <span>Опыт: {profile.yearsExp} {pluralYears(profile.yearsExp)}</span>
+                {profile.bio && <p className="text-sm text-subtle leading-relaxed">{profile.bio}</p>}
+                <div className="flex flex-wrap items-center gap-3 text-sm text-dim">
+                  <span>Опыт: <span className="text-subtle font-medium">{profile.yearsExp} {pluralYears(profile.yearsExp)}</span></span>
                   <span>·</span>
-                  <span>{WORK_FORMAT_LABELS[profile.workFormat]}</span>
+                  <span className="text-subtle font-medium">{WORK_FORMAT_LABELS[profile.workFormat]}</span>
                   <span>·</span>
-                  <span>{profile.salaryMin.toLocaleString("ru-RU")} — {profile.salaryMax.toLocaleString("ru-RU")} {profile.currency}</span>
+                  <span className="text-subtle font-medium">{profile.salaryMin.toLocaleString("ru-RU")} — {profile.salaryMax.toLocaleString("ru-RU")} {profile.currency}</span>
                 </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base">Навыки</CardTitle>
+                <CardTitle>Навыки</CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="flex flex-wrap gap-2">
@@ -235,14 +236,14 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
             {profile.portfolio.length > 0 && (
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Портфолио</CardTitle>
+                  <CardTitle>Портфолио</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0 space-y-2">
                   {profile.portfolio.map((p, i) => (
                     <a key={i} href={p.url} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-zinc-700 hover:text-zinc-900 group">
-                      <span className="text-xs bg-zinc-100 rounded px-2 py-0.5 font-medium">{p.label}</span>
-                      <span className="text-zinc-400 group-hover:text-zinc-600 truncate">{p.url}</span>
+                      className="flex items-center gap-2 text-sm group">
+                      <span className="text-xs bg-surface text-subtle rounded-full px-2.5 py-0.5 font-medium">{p.label}</span>
+                      <span className="text-dim group-hover:text-brand truncate transition-colors">{p.url}</span>
                     </a>
                   ))}
                 </CardContent>
@@ -250,38 +251,37 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
             )}
           </div>
         ) : (
-          /* ── Режим редактирования ── */
           <div className="space-y-5">
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Основное</CardTitle>
+                <CardTitle>Основное</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-5">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Имя</Label>
+                    <Label className="text-ink font-medium text-sm">Имя</Label>
                     <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Иван" />
                   </div>
                   <div className="space-y-2">
-                    <Label>Фамилия</Label>
+                    <Label className="text-ink font-medium text-sm">Фамилия</Label>
                     <Input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Иванов" />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>Специализация</Label>
+                  <Label className="text-ink font-medium text-sm">Специализация</Label>
                   <Input value={headline} onChange={(e) => setHeadline(e.target.value)} placeholder="Senior React Developer" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Опыт (лет)</Label>
+                    <Label className="text-ink font-medium text-sm">Опыт (лет)</Label>
                     <Input type="number" min={0} max={50} value={yearsExp} onChange={(e) => setYearsExp(e.target.value)} />
                   </div>
                   <div className="space-y-2">
-                    <Label>Грейд</Label>
+                    <Label className="text-ink font-medium text-sm">Грейд</Label>
                     <div className="grid grid-cols-3 gap-2">
                       {GRADES.map((g) => (
                         <button key={g.value} type="button" onClick={() => setGrade(g.value)}
-                          className={`rounded-lg border py-1.5 text-xs font-medium transition-colors ${grade === g.value ? "border-zinc-900 bg-zinc-900 text-white" : "border-zinc-200 hover:border-zinc-400"}`}>
+                          className={`rounded-full border py-2 text-xs font-semibold transition-all ${grade === g.value ? "border-brand bg-brand text-white" : "border-border text-subtle hover:border-brand/50"}`}>
                           {g.label}
                         </button>
                       ))}
@@ -289,23 +289,26 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>О себе <span className="text-zinc-400 font-normal">(необязательно)</span></Label>
-                  <Textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} placeholder="Коротко о своём опыте и подходе к работе..." />
+                  <Label className="text-ink font-medium text-sm">
+                    О себе <span className="text-dim font-normal">(необязательно)</span>
+                  </Label>
+                  <Textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} placeholder="Коротко о своём опыте и подходе к работе..."
+                    className="rounded-[10px] border-border focus-visible:border-brand focus-visible:ring-brand/15 resize-none text-ink placeholder:text-dim" />
                 </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Навыки</CardTitle>
+                <CardTitle>Навыки</CardTitle>
                 <CardDescription>Выбрано: {skills.length}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Input placeholder="Поиск навыка..." value={skillSearch} onChange={(e) => setSkillSearch(e.target.value)} />
                 {skills.length > 0 && (
-                  <div className="flex flex-wrap gap-2 p-3 bg-zinc-50 rounded-lg">
+                  <div className="flex flex-wrap gap-2 p-4 bg-surface/50 rounded-2xl">
                     {skills.map((s) => (
-                      <Badge key={s} variant="default" className="cursor-pointer bg-zinc-900 hover:bg-zinc-700" onClick={() => toggleSkill(s)}>
+                      <Badge key={s} variant="default" className="cursor-pointer hover:opacity-80" onClick={() => toggleSkill(s)}>
                         {s} ✕
                       </Badge>
                     ))}
@@ -314,11 +317,11 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
                 <div className="space-y-4 max-h-64 overflow-y-auto pr-1">
                   {filteredGroups.map((group) => (
                     <div key={group.category}>
-                      <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-2">{group.category}</p>
+                      <p className="text-[11px] font-semibold text-dim uppercase tracking-wider mb-2">{group.category}</p>
                       <div className="flex flex-wrap gap-2">
                         {group.skills.map((s) => (
                           <button key={s} type="button" onClick={() => toggleSkill(s)}
-                            className={`rounded-full px-3 py-1 text-sm border transition-colors ${skills.includes(s) ? "border-zinc-900 bg-zinc-900 text-white" : "border-zinc-200 hover:border-zinc-400 bg-white"}`}>
+                            className={`rounded-full px-3 py-1.5 text-sm border font-medium transition-all ${skills.includes(s) ? "border-brand bg-brand text-white" : "border-border text-subtle hover:border-brand/50 hover:text-ink bg-white"}`}>
                             {s}
                           </button>
                         ))}
@@ -331,29 +334,28 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Условия работы</CardTitle>
+                <CardTitle>Условия работы</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-5">
                 <div className="space-y-2">
-                  <Label>Формат</Label>
+                  <Label className="text-ink font-medium text-sm">Формат</Label>
                   <div className="grid grid-cols-3 gap-3">
                     {WORK_FORMATS.map((f) => (
                       <button key={f.value} type="button" onClick={() => setWorkFormat(f.value)}
-                        className={`rounded-lg border-2 p-3 text-left transition-colors ${workFormat === f.value ? "border-zinc-900 bg-zinc-900 text-white" : "border-zinc-200 hover:border-zinc-400"}`}>
-                        <div className="font-semibold text-sm">{f.label}</div>
-                        <div className={`text-xs mt-0.5 ${workFormat === f.value ? "text-zinc-300" : "text-zinc-500"}`}>{f.desc}</div>
+                        className={`rounded-2xl border-2 p-3.5 text-left transition-all ${workFormat === f.value ? "border-brand bg-brand text-white" : "border-border hover:border-brand/40"}`}>
+                        <div className={`font-semibold text-sm ${workFormat === f.value ? "text-white" : "text-ink"}`}>{f.label}</div>
+                        <div className={`text-xs mt-0.5 ${workFormat === f.value ? "text-white/70" : "text-dim"}`}>{f.desc}</div>
                       </button>
                     ))}
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>Зарплатная вилка</Label>
+                  <Label className="text-ink font-medium text-sm">Зарплатная вилка</Label>
                   <div className="flex items-center gap-3">
                     <Input type="number" placeholder="100 000" value={salaryMin} onChange={(e) => setSalaryMin(e.target.value)} />
-                    <span className="text-zinc-400">—</span>
+                    <span className="text-dim font-medium">—</span>
                     <Input type="number" placeholder="150 000" value={salaryMax} onChange={(e) => setSalaryMax(e.target.value)} />
-                    <select value={currency} onChange={(e) => setCurrency(e.target.value)}
-                      className="h-10 rounded-md border border-zinc-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900">
+                    <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="h-11 w-20 shrink-0 rounded-[10px] border border-border bg-white px-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-colors">
                       <option>RUB</option>
                       <option>USD</option>
                       <option>EUR</option>
@@ -365,7 +367,7 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Портфолио</CardTitle>
+                <CardTitle>Портфолио</CardTitle>
                 <CardDescription>Ссылки на ваши работы</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -373,7 +375,7 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
                   <div key={i} className="flex gap-2 items-start">
                     <select value={p.label}
                       onChange={(e) => { const arr = [...portfolio]; arr[i] = { ...arr[i], label: e.target.value }; setPortfolio(arr); }}
-                      className="h-10 w-32 rounded-md border border-zinc-200 bg-white px-2 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 shrink-0">
+                      className={`${SELECT_CLASS} w-32 shrink-0`}>
                       {PORTFOLIO_LABELS.map((l) => <option key={l}>{l}</option>)}
                     </select>
                     <Input placeholder="https://github.com/username" value={p.url}
@@ -381,23 +383,23 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
                     {portfolio.length > 1 && (
                       <button type="button"
                         onClick={() => setPortfolio(portfolio.filter((_, idx) => idx !== i))}
-                        className="text-zinc-400 hover:text-red-500 text-lg leading-10 px-1">✕</button>
+                        className="text-dim hover:text-destructive text-lg h-11 px-1 flex items-center transition-colors">✕</button>
                     )}
                   </div>
                 ))}
                 {portfolio.length < 5 && (
                   <button type="button"
                     onClick={() => setPortfolio([...portfolio, { label: "Другое", url: "" }])}
-                    className="text-sm text-zinc-500 hover:text-zinc-900 underline">
+                    className="text-sm font-medium text-brand hover:opacity-80 transition-opacity">
                     + Добавить ссылку
                   </button>
                 )}
               </CardContent>
             </Card>
 
-            {error && <p className="text-sm text-red-500">{error}</p>}
+            {error && <p className="text-sm text-destructive">{error}</p>}
 
-            <div className="flex gap-3 justify-end">
+            <div className="flex gap-3 justify-end pb-4">
               <Button variant="outline" onClick={cancelEdit} disabled={loading}>Отменить</Button>
               <Button onClick={handleSave} disabled={loading}>
                 {loading ? "Сохраняем..." : "Сохранить изменения"}

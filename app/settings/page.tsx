@@ -17,15 +17,15 @@ export default async function SettingsPage() {
     dbUser.role === "CANDIDATE" ? "/candidate/dashboard" : "/employer/dashboard";
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="bg-white border-b px-6 py-4 flex items-center justify-between">
-        <div className="font-bold text-lg">Собес</div>
+    <div className="min-h-screen bg-[#f4f6f2]">
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-sm border-b border-black/[0.08] px-4 sm:px-6 h-14 flex items-center justify-between">
+        <div className="text-brand font-bold text-xl tracking-tight">Собес</div>
         <div className="flex items-center gap-4">
-          <Link href={dashboardHref} className="text-sm text-zinc-500 hover:text-zinc-900">
+          <Link href={dashboardHref} className="text-sm font-medium text-subtle hover:text-ink transition-colors">
             ← Дашборд
           </Link>
           <form action={logout}>
-            <button type="submit" className="text-sm text-zinc-400 hover:text-zinc-600">
+            <button type="submit" className="text-sm text-dim hover:text-subtle transition-colors">
               Выйти
             </button>
           </form>
@@ -33,10 +33,10 @@ export default async function SettingsPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-8 space-y-8">
-        <h1 className="text-2xl font-bold">Настройки</h1>
+        <h1 className="text-[24px] font-bold text-ink tracking-tight">Настройки</h1>
 
         <section>
-          <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-3">
+          <h2 className="text-[11px] font-semibold text-dim uppercase tracking-wider mb-4">
             Интеграции
           </h2>
           <YandexCalendarConnect returnTo="/settings" />

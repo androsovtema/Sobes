@@ -49,50 +49,65 @@ export default async function EmployerDashboard() {
   const archived = company.positions.filter((p) => !p.isActive);
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="bg-white border-b px-4 sm:px-6 py-4 flex items-center justify-between gap-2">
-        <div className="font-bold text-lg shrink-0">Собес</div>
-        <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 sm:gap-4">
-          <Link href="/employer/interviews" className="text-sm text-zinc-500 hover:text-zinc-900">
+    <div className="min-h-screen bg-[#f4f6f2]">
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-sm border-b border-black/[0.08] px-4 sm:px-6 h-14 flex items-center justify-between">
+        <div className="text-brand font-bold text-xl tracking-tight">Собес</div>
+        <div className="flex items-center gap-4 sm:gap-5">
+          <Link href="/employer/interviews" className="text-sm font-medium text-subtle hover:text-ink transition-colors">
             Встречи
           </Link>
-          <Link href="/employer/positions/new" className="text-sm text-zinc-500 hover:text-zinc-900 hidden sm:inline">
-            + Новая вакансия
+          <Link href="/employer/positions/new" className="text-sm font-medium text-subtle hover:text-ink transition-colors hidden sm:inline">
+            + Вакансия
           </Link>
-          <Link href="/settings" className="text-sm text-zinc-500 hover:text-zinc-900 hidden sm:inline">
+          <Link href="/settings" className="text-sm font-medium text-subtle hover:text-ink transition-colors hidden sm:inline">
             Настройки
           </Link>
           <form action={logout}>
-            <button type="submit" className="text-sm text-zinc-400 hover:text-zinc-600">Выйти</button>
+            <button type="submit" className="text-sm text-dim hover:text-subtle transition-colors">
+              Выйти
+            </button>
           </form>
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-8 space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        {/* Company header */}
+        <div className="flex flex-wrap items-start justify-between gap-4 pt-2">
           <div>
-            <h1 className="text-2xl font-bold">{company.name}</h1>
-            {company.industry && <p className="text-zinc-500 mt-0.5">{company.industry} · {company.size}</p>}
+            <h1 className="text-[26px] font-bold text-ink tracking-tight">{company.name}</h1>
+            {company.industry && (
+              <p className="text-subtle mt-0.5 text-[15px]">
+                {company.industry}
+                {company.size && <span className="text-dim"> · {company.size}</span>}
+              </p>
+            )}
           </div>
           <Link href="/employer/positions/new">
             <Button>+ Новая вакансия</Button>
           </Link>
         </div>
 
+        {/* Active positions */}
         <section>
-          <h2 className="text-lg font-semibold mb-3">
-            Активные вакансии
-            {active.length > 0 && <span className="ml-2 text-sm font-normal text-zinc-500">({active.length})</span>}
-          </h2>
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="text-[17px] font-semibold text-ink">Активные вакансии</h2>
+            {active.length > 0 && (
+              <span className="text-xs text-dim font-medium">({active.length})</span>
+            )}
+          </div>
 
           {active.length === 0 ? (
             <Card>
-              <CardContent className="py-10 text-center text-zinc-400">
-                <p className="text-4xl mb-3">📋</p>
-                <p>Нет активных вакансий</p>
-                <p className="text-sm mt-1">Создайте первую вакансию — алгоритм начнёт подбирать кандидатов</p>
-                <Link href="/employer/positions/new" className="mt-4 inline-block">
-                  <Button className="mt-4">Создать вакансию</Button>
+              <CardContent className="py-12 text-center">
+                <div className="w-12 h-12 rounded-full bg-surface flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">📋</span>
+                </div>
+                <p className="font-medium text-ink">Нет активных вакансий</p>
+                <p className="text-sm text-subtle mt-1 max-w-xs mx-auto">
+                  Создайте первую вакансию — алгоритм начнёт подбирать кандидатов
+                </p>
+                <Link href="/employer/positions/new" className="mt-5 inline-block">
+                  <Button>Создать вакансию</Button>
                 </Link>
               </CardContent>
             </Card>
@@ -107,7 +122,7 @@ export default async function EmployerDashboard() {
 
         {archived.length > 0 && (
           <section>
-            <h2 className="text-lg font-semibold mb-3 text-zinc-400">Архив</h2>
+            <h2 className="text-[17px] font-semibold text-dim mb-4">Архив</h2>
             <div className="space-y-3">
               {archived.map((position) => (
                 <PositionCard key={position.id} position={position} dimmed />
@@ -131,39 +146,48 @@ function PositionCard({
   const invitedCount = position.matches.filter((m: any) => m.status === "INVITED").length;
 
   return (
-    <Card className={dimmed ? "opacity-60" : ""}>
-      <CardContent className="py-4">
+    <Card className={dimmed ? "opacity-50" : ""}>
+      <CardContent className="py-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <p className="font-semibold">{position.title}</p>
-              <Badge variant="outline" className="text-xs">{GRADE_LABELS[position.grade]}</Badge>
-              <Badge variant="outline" className="text-xs">{FORMAT_LABELS[position.workFormat]}</Badge>
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <p className="font-semibold text-ink text-[15px]">{position.title}</p>
+              <Badge variant="secondary" className="text-xs">{GRADE_LABELS[position.grade]}</Badge>
+              <Badge variant="secondary" className="text-xs">{FORMAT_LABELS[position.workFormat]}</Badge>
             </div>
-            <p className="text-sm text-zinc-500 mt-1">
+            <p className="text-sm text-subtle">
               {position.salaryMin.toLocaleString("ru-RU")} — {position.salaryMax.toLocaleString("ru-RU")} {position.currency}
             </p>
-            <div className="flex flex-wrap gap-1 mt-2">
+            <div className="flex flex-wrap gap-1.5 mt-2.5">
               {position.skills.slice(0, 5).map((ps: any) => (
-                <span key={ps.skill.id} className="text-xs bg-zinc-100 text-zinc-600 px-2 py-0.5 rounded">{ps.skill.name}</span>
+                <span
+                  key={ps.skill.id}
+                  className="text-xs bg-surface text-subtle px-2.5 py-0.5 rounded-full"
+                >
+                  {ps.skill.name}
+                </span>
               ))}
               {position.skills.length > 5 && (
-                <span className="text-xs text-zinc-400">+{position.skills.length - 5}</span>
+                <span className="text-xs text-dim">+{position.skills.length - 5}</span>
               )}
             </div>
           </div>
-          <div className="shrink-0 text-right">
+          <div className="shrink-0">
             <Link href={`/employer/positions/${position.id}/candidates`}>
               {pendingCount > 0 ? (
-                <Button size="sm" variant="default">
+                <Button size="sm">
                   {pendingCount} {pluralCandidates(pendingCount)}
                 </Button>
               ) : invitedCount > 0 ? (
-                <Button size="sm" variant="outline" className="text-amber-700 border-amber-300 bg-amber-50">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-amber-400 text-amber-700 hover:bg-amber-50"
+                >
                   {invitedCount} приглашено
                 </Button>
               ) : (
-                <Button size="sm" variant="outline" className="text-zinc-500">
+                <Button size="sm" variant="outline">
                   Кандидаты
                 </Button>
               )}

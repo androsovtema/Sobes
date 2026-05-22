@@ -20,6 +20,7 @@ const DAYS: { value: Day; label: string; short: string }[] = [
 ];
 
 const TIMES = Array.from({ length: 25 }, (_, i) => `${String(i).padStart(2, "0")}:00`);
+const SELECT_CLASS = "w-full h-11 rounded-[10px] border border-border bg-white px-3 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition-colors";
 
 export default function CandidateAvailability() {
   const router = useRouter();
@@ -65,22 +66,32 @@ export default function CandidateAvailability() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 flex items-center justify-center py-10 px-4">
+    <div className="min-h-screen bg-[#f4f6f2] flex items-center justify-center py-10 px-4">
       <div className="w-full max-w-lg space-y-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold">Когда вам удобно?</h1>
-          <p className="text-zinc-500 mt-1">Укажите, в какие дни и часы вы готовы проходить собеседования</p>
+          <h1 className="text-[28px] font-bold text-ink tracking-tight">Когда вам удобно?</h1>
+          <p className="text-subtle mt-1.5 text-[15px]">
+            Укажите, в какие дни и часы вы готовы проходить собеседования
+          </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Дни недели</CardTitle>
+            <CardTitle>Дни недели</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-7 gap-2">
               {DAYS.map((d) => (
-                <button key={d.value} type="button" onClick={() => toggleDay(d.value)}
-                  className={`rounded-lg py-3 text-sm font-medium transition-colors ${selectedDays.has(d.value) ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"}`}>
+                <button
+                  key={d.value}
+                  type="button"
+                  onClick={() => toggleDay(d.value)}
+                  className={`rounded-full py-3 text-sm font-semibold transition-all ${
+                    selectedDays.has(d.value)
+                      ? "bg-brand text-white shadow-[0_2px_8px_rgba(18,44,0,0.2)]"
+                      : "bg-surface text-subtle hover:bg-surface/80"
+                  }`}
+                >
                   {d.short}
                 </button>
               ))}
@@ -90,34 +101,48 @@ export default function CandidateAvailability() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Временной промежуток</CardTitle>
+            <CardTitle>Временной промежуток</CardTitle>
             <CardDescription>Единый промежуток для всех выбранных дней</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5">
             <div className="flex items-center gap-4">
               <div className="flex-1 space-y-2">
-                <Label>С</Label>
-                <select value={startTime} onChange={(e) => setStartTime(e.target.value)}
-                  className="w-full h-10 rounded-md border border-zinc-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900">
+                <Label className="text-ink font-medium text-sm">С</Label>
+                <select
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  className={SELECT_CLASS}
+                >
                   {TIMES.slice(0, -1).map((t) => <option key={t}>{t}</option>)}
                 </select>
               </div>
-              <span className="text-zinc-400 pt-6">—</span>
+              <span className="text-dim pt-7 font-medium">—</span>
               <div className="flex-1 space-y-2">
-                <Label>До</Label>
-                <select value={endTime} onChange={(e) => setEndTime(e.target.value)}
-                  className="w-full h-10 rounded-md border border-zinc-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900">
+                <Label className="text-ink font-medium text-sm">До</Label>
+                <select
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className={SELECT_CLASS}
+                >
                   {TIMES.slice(1).map((t) => <option key={t}>{t}</option>)}
                 </select>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label>Максимум собеседований в день</Label>
+              <Label className="text-ink font-medium text-sm">Максимум собеседований в день</Label>
               <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((n) => (
-                  <button key={n} type="button" onClick={() => setMaxPerDay(n)}
-                    className={`w-12 h-10 rounded-lg border text-sm font-medium transition-colors ${maxPerDay === n ? "border-zinc-900 bg-zinc-900 text-white" : "border-zinc-200 hover:border-zinc-400"}`}>
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => setMaxPerDay(n)}
+                    className={`w-11 h-11 rounded-full border text-sm font-semibold transition-all ${
+                      maxPerDay === n
+                        ? "border-brand bg-brand text-white"
+                        : "border-border text-subtle hover:border-brand/50"
+                    }`}
+                  >
                     {n}
                   </button>
                 ))}
@@ -126,14 +151,17 @@ export default function CandidateAvailability() {
           </CardContent>
         </Card>
 
-        {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+        {error && <p className="text-sm text-destructive text-center">{error}</p>}
 
         <div className="flex flex-col gap-3">
-          <Button onClick={handleSave} disabled={loading} className="w-full">
+          <Button onClick={handleSave} disabled={loading} size="lg" className="w-full">
             {loading ? "Сохраняем..." : "Готово — перейти в личный кабинет"}
           </Button>
-          <button type="button" onClick={() => router.push("/candidate/dashboard")}
-            className="text-sm text-zinc-400 hover:text-zinc-600 text-center">
+          <button
+            type="button"
+            onClick={() => router.push("/candidate/dashboard")}
+            className="text-sm text-dim hover:text-subtle text-center transition-colors"
+          >
             Пропустить — настрою позже
           </button>
         </div>

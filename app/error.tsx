@@ -15,11 +15,11 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-zinc-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#f4f6f2] flex items-center justify-center px-4">
       <div className="text-center max-w-md">
         <p className="text-5xl mb-4">⚠️</p>
-        <h1 className="text-2xl font-bold text-zinc-900 mb-2">Что-то пошло не так</h1>
-        <p className="text-zinc-500 mb-8">
+        <h1 className="text-2xl font-bold text-ink mb-2">Что-то пошло не так</h1>
+        <p className="text-subtle mb-8">
           Произошла непредвиденная ошибка. Попробуйте обновить страницу.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -29,7 +29,7 @@ export default function GlobalError({
           </Button>
         </div>
         {error.digest && (
-          <p className="text-xs text-zinc-400 mt-6">ID ошибки: {error.digest}</p>
+          <p className="text-xs text-dim mt-6">ID ошибки: {error.digest}</p>
         )}
       </div>
     </div>

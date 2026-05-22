@@ -76,23 +76,23 @@ export default function CandidatesClient({
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="bg-white border-b px-4 sm:px-6 py-4 flex items-center justify-between gap-2">
-        <div className="font-bold text-lg shrink-0">Собес</div>
-        <div className="flex items-center gap-3 sm:gap-4">
-          <Link href="/employer/dashboard" className="text-sm text-zinc-500 hover:text-zinc-900">
+    <div className="min-h-screen bg-[#f4f6f2]">
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-sm border-b border-black/[0.08] px-4 sm:px-6 h-14 flex items-center justify-between">
+        <div className="text-brand font-bold text-xl tracking-tight">Собес</div>
+        <div className="flex items-center gap-4">
+          <Link href="/employer/dashboard" className="text-sm font-medium text-subtle hover:text-ink transition-colors">
             ← Дашборд
           </Link>
           <form action={logout}>
-            <button type="submit" className="text-sm text-zinc-400 hover:text-zinc-600">Выйти</button>
+            <button type="submit" className="text-sm text-dim hover:text-subtle transition-colors">Выйти</button>
           </form>
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-8 space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">{positionTitle}</h1>
-          <p className="text-zinc-500 mt-1">
+        <div className="pt-2">
+          <h1 className="text-[24px] font-bold text-ink tracking-tight">{positionTitle}</h1>
+          <p className="text-subtle mt-0.5 text-[15px]">
             {candidates.length > 0
               ? `${candidates.length} ${pluralCandidates(candidates.length)} ждут решения`
               : "Все кандидаты обработаны"}
@@ -101,12 +101,16 @@ export default function CandidatesClient({
 
         {candidates.length === 0 ? (
           <Card>
-            <CardContent className="py-10 text-center text-zinc-400">
-              <p className="text-4xl mb-3">✅</p>
-              <p>Кандидатов для просмотра нет</p>
-              <p className="text-sm mt-1">Алгоритм подберёт новых кандидатов по мере регистрации соискателей</p>
-              <Link href="/employer/dashboard" className="mt-4 inline-block">
-                <Button variant="outline" className="mt-4">← Вернуться на дашборд</Button>
+            <CardContent className="py-12 text-center">
+              <div className="w-12 h-12 rounded-full bg-cta/20 flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">✅</span>
+              </div>
+              <p className="font-medium text-ink">Кандидатов для просмотра нет</p>
+              <p className="text-sm text-subtle mt-1 max-w-xs mx-auto">
+                Алгоритм подберёт новых кандидатов по мере регистрации соискателей
+              </p>
+              <Link href="/employer/dashboard" className="mt-5 inline-block">
+                <Button variant="outline">← Вернуться на дашборд</Button>
               </Link>
             </CardContent>
           </Card>
@@ -143,18 +147,18 @@ function CandidateCard({
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0 space-y-3">
             <div className="flex items-center gap-2 flex-wrap">
-              <p className="font-semibold text-lg">
+              <p className="font-semibold text-ink text-[16px]">
                 {candidate.firstName} {candidate.lastName}
               </p>
-              <Badge variant="outline">{GRADE_LABELS[candidate.grade] ?? candidate.grade}</Badge>
-              <span className="text-xs text-zinc-700 bg-emerald-100 rounded px-2 py-0.5 font-medium">
-                Совпадение {candidate.score}%
+              <Badge variant="secondary">{GRADE_LABELS[candidate.grade] ?? candidate.grade}</Badge>
+              <span className="text-xs bg-cta/20 text-brand rounded-full px-2.5 py-0.5 font-semibold">
+                {candidate.score}% совпадение
               </span>
               {candidate.scoreBreakdown && (
                 <button
                   type="button"
                   onClick={() => setShowWhy((v) => !v)}
-                  className="text-xs text-zinc-500 hover:text-zinc-900 underline underline-offset-2"
+                  className="text-xs text-dim hover:text-brand underline underline-offset-2 transition-colors"
                 >
                   {showWhy ? "Скрыть" : "Почему в топе?"}
                 </button>
@@ -165,20 +169,27 @@ function CandidateCard({
               <WhyBreakdown breakdown={candidate.scoreBreakdown} />
             )}
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {candidate.skills.slice(0, 8).map((s) => (
-                <span key={s} className="text-xs bg-zinc-100 text-zinc-700 px-2 py-0.5 rounded">{s}</span>
+                <span key={s} className="text-xs bg-surface text-subtle px-2.5 py-0.5 rounded-full">
+                  {s}
+                </span>
               ))}
               {candidate.skills.length > 8 && (
-                <span className="text-xs text-zinc-400">+{candidate.skills.length - 8}</span>
+                <span className="text-xs text-dim">+{candidate.skills.length - 8}</span>
               )}
             </div>
 
             {candidate.portfolio.length > 0 && (
               <div className="flex flex-wrap gap-3">
                 {candidate.portfolio.map((p, i) => (
-                  <a key={i} href={p.url} target="_blank" rel="noopener noreferrer"
-                    className="text-xs text-zinc-500 hover:text-zinc-900 flex items-center gap-1 underline-offset-2 hover:underline">
+                  <a
+                    key={i}
+                    href={p.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-brand hover:opacity-80 underline-offset-2 hover:underline transition-all"
+                  >
                     {p.label}
                   </a>
                 ))}
@@ -187,11 +198,7 @@ function CandidateCard({
           </div>
 
           <div className="flex flex-col gap-2 shrink-0">
-            <Button
-              size="sm"
-              onClick={() => onDecide("invite")}
-              disabled={processing}
-            >
+            <Button size="sm" onClick={() => onDecide("invite")} disabled={processing}>
               Позвать
             </Button>
             <Button
@@ -199,7 +206,6 @@ function CandidateCard({
               variant="outline"
               onClick={() => onDecide("skip")}
               disabled={processing}
-              className="text-zinc-500"
             >
               Пропустить
             </Button>
@@ -223,22 +229,10 @@ function WhyBreakdown({ breakdown }: { breakdown: NonNullable<Candidate["scoreBr
       tone: pct >= 80 ? "good" : pct >= 50 ? "neutral" : "warn",
     });
     if (fit.meta?.matchedViaRelation && fit.meta.matchedViaRelation.length > 0) {
-      rows.push({
-        label: "Засчитано через родственные навыки",
-        value: `${fit.meta.matchedViaRelation.length}`,
-        tone: "neutral",
-      });
+      rows.push({ label: "Засчитано через родственные навыки", value: `${fit.meta.matchedViaRelation.length}`, tone: "neutral" });
     }
-    rows.push({
-      label: "Зарплата",
-      value: `+${Math.round(fit.salary)}`,
-      tone: fit.salary >= 9 ? "good" : "neutral",
-    });
-    rows.push({
-      label: "Опыт под грейд",
-      value: `+${Math.round(fit.experienceYears)}`,
-      tone: fit.experienceYears >= 7 ? "good" : "warn",
-    });
+    rows.push({ label: "Зарплата", value: `+${Math.round(fit.salary)}`, tone: fit.salary >= 9 ? "good" : "neutral" });
+    rows.push({ label: "Опыт под грейд", value: `+${Math.round(fit.experienceYears)}`, tone: fit.experienceYears >= 7 ? "good" : "warn" });
   }
   if (feas) {
     rows.push({
@@ -258,26 +252,22 @@ function WhyBreakdown({ breakdown }: { breakdown: NonNullable<Candidate["scoreBr
     });
   }
   return (
-    <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 space-y-1.5">
-      <p className="text-xs font-semibold text-zinc-700 mb-2">Разбор балла</p>
+    <div className="rounded-2xl border border-border bg-surface/30 p-4 space-y-1.5">
+      <p className="text-xs font-semibold text-ink mb-2">Разбор балла</p>
       {rows.map((r) => (
         <div key={r.label} className="flex items-center justify-between text-xs">
-          <span className="text-zinc-600">{r.label}</span>
-          <span
-            className={
-              r.tone === "good"
-                ? "font-medium text-emerald-700"
-                : r.tone === "warn"
-                ? "font-medium text-amber-700"
-                : "font-medium text-zinc-700"
-            }
-          >
+          <span className="text-subtle">{r.label}</span>
+          <span className={
+            r.tone === "good" ? "font-semibold text-brand" :
+            r.tone === "warn" ? "font-semibold text-amber-700" :
+            "font-semibold text-subtle"
+          }>
             {r.value}
           </span>
         </div>
       ))}
       {breakdown.fit?.meta?.missingRequiredSkills && breakdown.fit.meta.missingRequiredSkills.length > 0 && (
-        <p className="text-[11px] text-zinc-500 pt-1.5 border-t border-zinc-200 mt-2">
+        <p className="text-[11px] text-dim pt-1.5 border-t border-border mt-2">
           Не хватает обязательных навыков: {breakdown.fit.meta.missingRequiredSkills.length} шт.
         </p>
       )}

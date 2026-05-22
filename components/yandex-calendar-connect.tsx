@@ -64,10 +64,10 @@ export function YandexCalendarConnect({ returnTo }: { returnTo: string }) {
             <p className="font-semibold flex items-center gap-2">
               <span>Яндекс Календарь</span>
               {status?.connected && (
-                <Badge variant="outline" className="bg-emerald-100 text-emerald-800 text-xs">подключён</Badge>
+                <Badge variant="accent" className="text-xs">подключён</Badge>
               )}
             </p>
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-subtle">
               {status?.connected
                 ? "Встречи будут автоматически создаваться в вашем Яндекс Календаре со ссылкой Телемост."
                 : "Подключите аккаунт, чтобы встреча со ссылкой Телемост появлялась в вашем календаре автоматически."}
@@ -76,7 +76,7 @@ export function YandexCalendarConnect({ returnTo }: { returnTo: string }) {
         </div>
 
         {status?.connected && (
-          <div className="text-xs text-zinc-600 space-y-1">
+          <div className="text-xs text-subtle space-y-1">
             <p>Аккаунт: <span className="font-medium">{status.email ?? status.login}</span></p>
             {status.displayName && <p>{status.displayName}</p>}
           </div>
@@ -95,7 +95,7 @@ export function YandexCalendarConnect({ returnTo }: { returnTo: string }) {
         </div>
 
         {flash && (
-          <p className={`text-xs ${flash.tone === "ok" ? "text-emerald-700" : "text-red-600"}`}>{flash.text}</p>
+          <p className={`text-xs font-medium ${flash.tone === "ok" ? "text-brand" : "text-destructive"}`}>{flash.text}</p>
         )}
       </CardContent>
     </Card>
